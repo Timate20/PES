@@ -1,5 +1,5 @@
 # design
-vcom ../VHDL_Ex3.data/sources/div16.vhd
+vcom +acc=rnbp ../VHDL_Ex3.data/sources/div16.vhd
 
 # testbench
 vcom ../VHDL_Ex3.data/sources/div16_tb.vhd
