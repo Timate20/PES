@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.numeric_std.unsigned;
+use std.textio.all;
 
 entity div16_8_8 is
 	generic(
@@ -36,18 +37,69 @@ begin
 		variable v_result 	: UNSIGNED( 8 downto 1);
         variable a_signed 	: SIGNED(16 downto 0);
         variable a_unsigned : UNSIGNED(15 downto 0);
+
+
 	begin
 		if rstn = '0' then
 	
 	        -- STUDENT CODE HERE
-
+			--result <= (others => '0');
 
             -- STUDENT CODE until HERE
 		elsif rising_edge(clk) then
 		
     		-- STUDENT CODE HERE
+			-- Reinschaufeln
+			r_remainder(1) <= unsigned(a(15 downto 0));
+				--priority encoder to determine the amount of bitshifts
+				IF b(7) = '1' THEN
+					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),8);
+				ELSIF b(6) = '1' THEN
+					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),9);
+				ELSIF b(5) = '1' THEN
+					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),10);				
+				ELSIF b(4) = '1' THEN
+					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),11);
+				ELSIF b(3) = '1' THEN
+					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),12);
+				ELSIF b(2) = '1' THEN
+					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),13);
+				ELSIF b(1) = '1' THEN
+					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),14);
+				ELSIF b(0) = '1' THEN
+					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),15);
+				END IF;
 
 
+
+
+
+			-- Berechnen
+				-- Vergleicher
+					--R1
+					FOR i IN 1 TO 8 LOOP
+						IF r_remainder(i) <  r_shifted_b(i) THEN
+						r_result(i)(0) <= '0';
+						ELSE
+						r_result(i)(0) <= '1';
+						END IF;
+					END LOOP;
+
+
+
+
+				-- Subtrahierer
+
+				-- Shift Divisor
+
+			
+			-- Weitergeben
+			r_remainder(2 to 9) <= r_remainder(1 to 8);
+			r_shifted_b(2 to 9) <= r_shifted_b(1 to 8);
+			r_result(2 to 9) <= r_result(1 to 8);
+	
+			-- Rausschaufeln
+			r_result_signed(7 downto 0) <= signed(r_remainder(9)(7 downto 0)); --Result anstatt Remainder
 			-- STUDENT CODE until HERE
 		end if;
 	end process;
