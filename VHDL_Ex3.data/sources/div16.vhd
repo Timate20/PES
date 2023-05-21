@@ -43,63 +43,62 @@ begin
 		if rstn = '0' then
 	
 	        -- STUDENT CODE HERE
-			--result <= (others => '0');
+			result <= (others => '0');
+			r_en <= (others => '0');
+
+			FOR i IN 1 TO 9 LOOP
+				r_remainder(i) <= (others => '0');
+				r_shifted_b(i) <= (others => '0');
+				r_result(i) <= (others => '0');
+
+
+			END LOOP;
 
             -- STUDENT CODE until HERE
-		elsif rising_edge(clk) then
+		elsif rising_edge(clk) and en = '1' then
 		
     		-- STUDENT CODE HERE
+			-- Initialisieren
+				r_remainder(1) 	<= (others => '0');
+				r_shifted_b(1) 	<= (others => '0');
+				r_result(1) 	<= (others => '0');
+
 			-- Reinschaufeln
-			r_remainder(1) <= unsigned(a(15 downto 0));
-				--priority encoder to determine the amount of bitshifts
-				IF b(7) = '1' THEN
-					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),8);
-				ELSIF b(6) = '1' THEN
-					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),9);
-				ELSIF b(5) = '1' THEN
-					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),10);				
-				ELSIF b(4) = '1' THEN
-					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),11);
-				ELSIF b(3) = '1' THEN
-					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),12);
-				ELSIF b(2) = '1' THEN
-					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),13);
-				ELSIF b(1) = '1' THEN
-					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),14);
-				ELSIF b(0) = '1' THEN
-					r_shifted_b(1)(7 downto 0) <= shift_left(unsigned(b),15);
-				END IF;
-
-
-
-
+				r_remainder(1) <= unsigned(a(15 downto 0));
+				r_shifted_b(1)(15 downto 8) <= unsigned(b);
+				r_en(1) <= '1';
 
 			-- Berechnen
 				-- Vergleicher
-					--R1
-					FOR i IN 1 TO 8 LOOP
+
+				FOR i IN 1 TO 8 LOOP
+					IF r_en(i) = '1' THEN
 						IF r_remainder(i) <  r_shifted_b(i) THEN
-						r_result(i)(0) <= '0';
+							r_result(i)(8 - i) <= '0';
+							r_remainder(i + 1) <= r_remainder(i);
 						ELSE
-						r_result(i)(0) <= '1';
+							r_result(i)(8 - i) <= '1';
+							r_remainder(i + 1) <= r_remainder(i) - r_shifted_b(i);
+
 						END IF;
-					END LOOP;
+					END IF;
+				END LOOP;
 
-
-
-
-				-- Subtrahierer
+				r_en(2 to 9) <= r_en(1 to 8);
 
 				-- Shift Divisor
+				FOR i IN 1 to 8 LOOP
+					r_shifted_b(i + 1) <= (others => '0');
+					r_shifted_b(i + 1)((15 - i) downto (8 - i)) <= r_shifted_b(i)((16 - i) downto (9 - i));
+				END LOOP;
 
 			
 			-- Weitergeben
-			r_remainder(2 to 9) <= r_remainder(1 to 8);
-			r_shifted_b(2 to 9) <= r_shifted_b(1 to 8);
+			--r_remainder(2 to 9) <= r_remainder(1 to 8);
 			r_result(2 to 9) <= r_result(1 to 8);
 	
 			-- Rausschaufeln
-			r_result_signed(7 downto 0) <= signed(r_remainder(9)(7 downto 0)); --Result anstatt Remainder
+			--r_result_signed <= '0' & unsigned(r_result(9));
 			-- STUDENT CODE until HERE
 		end if;
 	end process;
