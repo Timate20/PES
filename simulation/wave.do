@@ -10,6 +10,7 @@ add wave -noupdate /div16_tb/uut/r_remainder
 add wave -noupdate -expand /div16_tb/uut/r_shifted_b
 add wave -noupdate -expand /div16_tb/uut/r_result
 add wave -noupdate -expand /div16_tb/uut/r_en
+add wave -noupdate -expand /div16_tb/uut/r_sign
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {0 ns} 0}
 quietly wave cursor active 0
